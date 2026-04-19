@@ -160,6 +160,10 @@
   <button class="ap-mem-add" onclick="addMemory()">+ Добавить заметку</button>
 
   <div class="ap-divider"></div>
+  <button class="ap-pro-btn" id="apProBtn" onclick="openProModal()">
+    ✦ Получить Pro — 300 ₽/мес
+  </button>
+  <div class="ap-divider"></div>
   <button class="ap-logout" onclick="logout()">
     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>
     Выйти из аккаунта
@@ -174,6 +178,29 @@
     <textarea class="modal-input" id="memInput" rows="3" placeholder="Например: Я разработчик, предпочитаю Python..." style="resize:vertical"></textarea>
     <button class="btn-primary" onclick="saveMemory()">Сохранить</button>
     <button class="btn-icon" style="width:100%;justify-content:center;color:var(--t2)" onclick="closeMemoryModal()">Отмена</button>
+  </div>
+</div>
+
+<!-- ══ PRO MODAL ══ -->
+<div class="modal-overlay hidden" id="proModal">
+  <div class="modal pro-modal">
+    <button class="btn-icon" style="align-self:flex-end;margin-bottom:-8px" onclick="closeProModal()">✕</button>
+    <div class="pro-modal-badge">✦ PRO</div>
+    <div class="pro-modal-title">CronuxAI Pro</div>
+    <div class="pro-modal-price">300 <span>₽/месяц</span></div>
+    <ul class="pro-features">
+      <li>✓ 100 запросов в день</li>
+      <li>✓ Приоритетные ответы</li>
+      <li>✓ DeepThink режим</li>
+      <li>✓ Расширенная память</li>
+      <li>✓ Поиск в интернете без лимитов</li>
+    </ul>
+    <button class="btn-primary pro-pay-btn" onclick="activatePro()">
+      Активировать Pro
+    </button>
+    <p style="font-size:11px;color:var(--t3);text-align:center">
+      Демо-режим: оплата не требуется. В продакшне подключить ЮKassa.
+    </p>
   </div>
 </div>
 

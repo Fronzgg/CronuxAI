@@ -235,3 +235,29 @@ textarea#msgInput::placeholder { color: var(--t3); }
   .welcome-title { font-size: 26px; }
   .account-popup { left: 10px; right: 10px; width: auto; bottom: 80px; }
 }
+
+/* ══ PRO BUTTON in popup ══ */
+.ap-pro-btn {
+  width: 100%; padding: 10px;
+  background: linear-gradient(135deg, #f59e0b, #f97316);
+  border: none; border-radius: 10px;
+  color: #fff; font-size: 13px; font-weight: 700;
+  cursor: pointer; transition: opacity .15s;
+  box-shadow: 0 0 16px rgba(245,158,11,.3);
+}
+.ap-pro-btn:hover { opacity: .88; }
+
+/* ══ PRO MODAL ══ */
+.pro-modal { align-items: center; text-align: center; }
+.pro-modal-badge {
+  background: linear-gradient(135deg, #f59e0b, #f97316);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  font-size: 13px; font-weight: 800; letter-spacing: .1em;
+}
+.pro-modal-title { font-size: 22px; font-weight: 800; color: var(--t1); }
+.pro-modal-price { font-size: 36px; font-weight: 800; color: var(--t1); margin: 4px 0 16px; }
+.pro-modal-price span { font-size: 16px; color: var(--t2); font-weight: 400; }
+.pro-features { list-style: none; display: flex; flex-direction: column; gap: 8px; width: 100%; margin-bottom: 16px; }
+.pro-features li { font-size: 13.5px; color: var(--t2); text-align: left; padding: 8px 12px; background: var(--bg-hov); border-radius: 8px; }
+.pro-features li::first-letter { color: #34d399; }
+.pro-pay-btn { background: linear-gradient(135deg, #f59e0b, #f97316) !important; box-shadow: 0 0 20px rgba(245,158,11,.35) !important; }
