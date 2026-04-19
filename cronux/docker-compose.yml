@@ -1,0 +1,41 @@
+version: '3.8'
+
+services:
+  # Ollama — локальный запуск Qwen
+  ollama:
+    image: ollama/ollama:latest
+    container_name: cronux-ollama
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+    # Для GPU (NVIDIA):
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - driver: nvidia
+    #           count: all
+    #           capabilities: [gpu]
+    restart: unless-stopped
+
+  # Cronux API сервер
+  cronux-server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: cronux-api
+    ports:
+      - "3000:3000"
+    environment:
+      - AI_MODE=${AI_MODE:-mock}
+      - OLLAMA_URL=http://ollama:11434
+      - TOGETHER_API_KEY=${TOGETHER_API_KEY:-}
+      - DEEPSEEK_API_KEY=${DEEPSEEK_API_KEY:-}
+      - SERP_API_KEY=${SERP_API_KEY:-}
+    depends_on:
+      - ollama
+    restart: unless-stopped
+
+volumes:
+  ollama_data:

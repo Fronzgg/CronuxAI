@@ -1,0 +1,4 @@
+node_modules/
+cronux/server/.env
+.vscode/
+*.log

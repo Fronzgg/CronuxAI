@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CronuxAI</title>
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+</head>
+<body>
+
+<!-- ══ SIDEBAR ══ -->
+<aside class="sidebar" id="sidebar">
+  <div class="side-logo-row">
+    <img src="logo.png" alt="Cronux" />
+    <span class="side-logo-text">CronuxAI</span>
+  </div>
+  <nav class="side-nav">
+    <button class="side-item active" id="btnNew">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v8M8 12h8"/></svg>
+      Новый чат
+    </button>
+    <button class="side-item" id="btnShowChats">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+      Мои чаты
+    </button>
+    <button class="side-item" id="btnMemory">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
+      Память
+    </button>
+    <button class="side-item">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+      Инструменты
+    </button>
+  </nav>
+  <div class="side-divider"></div>
+  <div class="side-chat-list" id="chatList"></div>
+  <div class="side-spacer"></div>
+  <div class="side-divider"></div>
+  <nav class="side-nav">
+    <button class="side-item">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3M12 17h.01"/></svg>
+      Поддержка
+    </button>
+  </nav>
+  <div class="side-user" id="userRow">
+    <div class="user-ava" id="userAva">F</div>
+    <span class="user-nm" id="userName">Fronz</span>
+  </div>
+</aside>
+
+<!-- ══ MAIN ══ -->
+<main class="main">
+
+  <!-- Mobile topbar -->
+  <div class="mob-topbar" id="mobTopbar">
+    <button class="btn-icon" id="btnMobMenu">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    </button>
+    <div class="mob-logo">
+      <img src="logo.png" alt="Cronux" />
+      <span>CronuxAI</span>
+    </div>
+    <button class="btn-icon" id="btnMobAccount">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+    </button>
+  </div>
+
+  <!-- Desktop topbar (in-chat) -->
+  <div class="topbar hidden" id="topbar">
+    <button class="btn-icon" id="btnToggle">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    </button>
+    <span class="topbar-model" id="topbarModel">CronuxAI</span>
+  </div>
+
+  <div class="messages" id="messages">
+    <div class="welcome" id="welcome">
+      <img src="logo.png" class="welcome-logo" alt="Cronux" />
+      <div class="welcome-title">CronuxAI</div>
+      <div class="welcome-sub">Быстрые ответы, память и поиск в интернете</div>
+      <div class="model-tabs">
+        <button class="model-tab active" onclick="setTab('cronux',this)">✦ Instant</button>
+        <button class="model-tab" onclick="setTab('cronux-coder',this)">⚙ Coder</button>
+        <button class="model-tab" onclick="setTab('cronux-pro',this)">◈ Pro</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="input-area">
+    <div class="input-inner">
+      <div class="input-box">
+        <div class="input-row">
+          <label class="attach-lbl" for="fileInput" title="Прикрепить фото">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48"/></svg>
+          </label>
+          <input type="file" id="fileInput" accept="image/*" style="display:none" />
+          <div class="img-prev" id="imgPrev"></div>
+          <textarea id="msgInput" placeholder="Спросите CronuxAI..." rows="1" onkeydown="handleKey(event)"></textarea>
+          <button class="send-btn" id="sendBtn" onclick="sendMessage()" title="Отправить">
+            <img src="logo.png" alt="send" />
+          </button>
+        </div>
+        <div class="input-pills">
+          <button class="pill" id="pillSearch" onclick="toggleSearch()">
+            <span class="pill-ico">🔍</span> Поиск
+          </button>
+          <button class="pill" id="pillThink" onclick="toggleThink()">
+            <span class="pill-ico">◈</span> DeepThink
+          </button>
+          <span class="cred-hint" id="credHint"></span>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<!-- ══ ACCOUNT POPUP ══ -->
+<div class="popup-overlay hidden" id="accountPopupOverlay" onclick="closeAccountPopup()"></div>
+<div class="account-popup hidden" id="accountPopup">
+  <div class="ap-header">
+    <div class="ap-user">
+      <div class="ap-ava" id="apAva">F</div>
+      <div>
+        <div class="ap-name" id="apName">Fronz</div>
+        <div class="ap-plan" id="apPlan">Pro · Безлимит</div>
+      </div>
+    </div>
+    <button class="btn-icon" onclick="closeAccountPopup()">✕</button>
+  </div>
+
+  <div class="ap-section-title">Content Usage</div>
+  <div class="ap-usage-grid">
+    <div class="ap-usage-card">
+      <div class="ap-usage-label">Сообщений сегодня</div>
+      <div class="ap-usage-val" id="apMsgsToday">—</div>
+      <div class="ap-usage-bar"><div class="ap-usage-fill" id="apMsgsBar" style="width:0%"></div></div>
+    </div>
+    <div class="ap-usage-card">
+      <div class="ap-usage-label">Кредиты</div>
+      <div class="ap-usage-val" id="apCredits">∞</div>
+      <div class="ap-usage-bar"><div class="ap-usage-fill green" id="apCredBar" style="width:100%"></div></div>
+    </div>
+    <div class="ap-usage-card">
+      <div class="ap-usage-label">Поисков</div>
+      <div class="ap-usage-val" id="apSearches">0</div>
+      <div class="ap-usage-bar"><div class="ap-usage-fill blue" id="apSearchBar" style="width:0%"></div></div>
+    </div>
+    <div class="ap-usage-card">
+      <div class="ap-usage-label">Чатов всего</div>
+      <div class="ap-usage-val" id="apChatsTotal">0</div>
+      <div class="ap-usage-bar"><div class="ap-usage-fill purple" id="apChatsBar" style="width:0%"></div></div>
+    </div>
+  </div>
+
+  <div class="ap-section-title" style="margin-top:16px">Память</div>
+  <div class="ap-memory" id="apMemory">
+    <div class="ap-memory-empty" id="apMemEmpty">Память пуста</div>
+  </div>
+  <button class="ap-mem-add" onclick="addMemory()">+ Добавить заметку</button>
+
+  <div class="ap-divider"></div>
+  <button class="ap-logout" onclick="logout()">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>
+    Выйти из аккаунта
+  </button>
+</div>
+
+<!-- ══ MEMORY MODAL ══ -->
+<div class="modal-overlay hidden" id="memoryModal">
+  <div class="modal" style="max-width:420px">
+    <div class="modal-logo"><img src="logo.png" alt="Cronux" /> Память</div>
+    <p style="font-size:13px;color:var(--t2);text-align:center">Добавьте факт о себе — CronuxAI будет его помнить</p>
+    <textarea class="modal-input" id="memInput" rows="3" placeholder="Например: Я разработчик, предпочитаю Python..." style="resize:vertical"></textarea>
+    <button class="btn-primary" onclick="saveMemory()">Сохранить</button>
+    <button class="btn-icon" style="width:100%;justify-content:center;color:var(--t2)" onclick="closeMemoryModal()">Отмена</button>
+  </div>
+</div>
+
+<!-- ══ AUTH ══ -->
+<div class="modal-overlay" id="authModal">
+  <div class="modal">
+    <div class="modal-logo"><img src="logo.png" alt="Cronux" /> CronuxAI</div>
+    <div class="auth-tabs">
+      <button class="auth-tab active" onclick="switchTab('login')">Войти</button>
+      <button class="auth-tab" onclick="switchTab('register')">Регистрация</button>
+    </div>
+    <div id="loginForm">
+      <input class="modal-input" id="loginUser" type="text" placeholder="Имя пользователя" />
+      <input class="modal-input" id="loginPass" type="password" placeholder="Пароль" />
+      <button class="btn-primary" onclick="login()">Войти</button>
+      <p class="auth-hint" style="margin-top:8px">Тест: <b>Fronz</b> / <b>fronz123</b></p>
+    </div>
+    <div id="registerForm" style="display:none">
+      <input class="modal-input" id="regUser" type="text" placeholder="Имя пользователя" />
+      <input class="modal-input" id="regEmail" type="email" placeholder="Email" />
+      <input class="modal-input" id="regPass" type="password" placeholder="Пароль" />
+      <button class="btn-primary" onclick="register()">Создать аккаунт</button>
+    </div>
+    <div class="auth-error" id="authError"></div>
+  </div>
+</div>
+
+<!-- Sidebar overlay for mobile -->
+<div class="sidebar-overlay hidden" id="sidebarOverlay" onclick="closeSidebar()"></div>
+
+<script src="app.js"></script>
+</body>
+</html>
