@@ -1,0 +1,138 @@
+﻿<!DOCTYPE html>
+<html lang="ru" style="background:#05050A">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>CronuxAI</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--a1:#7C3AED;--a2:#A855F7;--bg:#05050A;--card:#0E0E16;--bdr:#1E1E2E;--t1:#fff;--t2:#8888A8;--t3:#44445A}
+html,body{height:100%;font-family:"Space Grotesk",system-ui,sans-serif;background:var(--bg);color:var(--t1);overflow-x:hidden}
+a{text-decoration:none}
+.nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:16px 48px;background:rgba(5,5,10,.8);backdrop-filter:blur(20px);border-bottom:1px solid rgba(255,255,255,.06)}
+.nav-logo{display:flex;align-items:center;gap:9px;font-size:17px;font-weight:700;color:#fff}
+.nav-logo img{width:26px;height:26px;border-radius:7px}
+.nav-links{display:flex;gap:28px}
+.nav-links a{color:var(--t2);font-size:14px;transition:color .15s}
+.nav-links a:hover{color:#fff}
+.nav-cta{padding:8px 20px;border:1px solid rgba(255,255,255,.15);border-radius:20px;color:#fff;font-size:14px;font-weight:500;transition:all .2s}
+.nav-cta:hover{background:rgba(255,255,255,.08)}
+.hero{position:relative;min-height:100vh;display:flex;align-items:center;justify-content:center;overflow:hidden;background:#000}
+.orb{position:absolute;border-radius:50%;filter:blur(90px);pointer-events:none;animation:orbFloat 9s ease-in-out infinite}
+.orb1{width:550px;height:550px;background:radial-gradient(circle,rgba(168,85,247,.28),transparent 70%);top:-80px;left:-80px;animation-delay:0s}
+.orb2{width:450px;height:450px;background:radial-gradient(circle,rgba(0,240,255,.2),transparent 70%);top:150px;right:-60px;animation-delay:-3s}
+.orb3{width:380px;height:380px;background:radial-gradient(circle,rgba(255,28,247,.18),transparent 70%);bottom:0;left:38%;animation-delay:-5.5s}
+@keyframes orbFloat{0%,100%{transform:translate(0,0) scale(1)}33%{transform:translate(28px,-38px) scale(1.04)}66%{transform:translate(-18px,18px) scale(.97)}}
+.hero-inner{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;text-align:center;padding:130px 24px 80px;max-width:860px}
+.badge{display:inline-flex;align-items:center;gap:6px;padding:6px 16px;border-radius:20px;border:1px solid rgba(168,85,247,.4);background:rgba(168,85,247,.1);font-size:13px;color:#C4B5FD;margin-bottom:28px;animation:up .6s ease both}
+.hero-title{font-size:clamp(52px,8vw,92px);font-weight:800;line-height:1.05;letter-spacing:-2px;margin-bottom:24px;animation:up .6s .1s ease both}
+.gp{background:linear-gradient(131deg,#FF1CF7 2%,#00F0FF 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.gc{background:linear-gradient(90deg,#00F0FF,#7C3AED);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.gu{background:linear-gradient(135deg,#A855F7,#6C63FF);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero-sub{font-size:17px;color:var(--t2);line-height:1.7;max-width:560px;margin-bottom:36px;animation:up .6s .2s ease both}
+.cta-row{display:flex;gap:14px;flex-wrap:wrap;justify-content:center;margin-bottom:56px;animation:up .6s .3s ease both}
+.btn-p{padding:14px 32px;border-radius:12px;background:linear-gradient(135deg,#7C3AED,#A855F7);color:#fff;font-size:15px;font-weight:600;transition:all .2s;box-shadow:0 0 24px rgba(124,58,237,.4);display:inline-block}
+.btn-p:hover{box-shadow:0 0 40px rgba(124,58,237,.65);transform:translateY(-2px)}
+.btn-g{padding:14px 32px;border-radius:12px;border:1px solid rgba(255,255,255,.15);color:var(--t2);font-size:15px;font-weight:500;transition:all .2s;display:inline-block}
+.btn-g:hover{border-color:rgba(255,255,255,.3);color:#fff}
+.stats{display:flex;align-items:center;gap:28px;animation:up .6s .4s ease both}
+.stat{display:flex;flex-direction:column;align-items:center;gap:3px}
+.sn{font-size:26px;font-weight:800;background:linear-gradient(90deg,#FF3BFF,#5C24FF);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.sl{font-size:11px;color:var(--t3);text-transform:uppercase;letter-spacing:.08em}
+.sdiv{width:1px;height:36px;background:var(--bdr)}
+@keyframes up{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+section{padding:90px 48px;max-width:1300px;margin:0 auto}
+.slbl{font-size:12px;color:#A855F7;text-transform:uppercase;letter-spacing:.12em;margin-bottom:14px}
+.stitle{font-size:clamp(32px,4vw,52px);font-weight:800;line-height:1.1;margin-bottom:52px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.card{background:var(--card);border:1px solid var(--bdr);border-radius:18px;padding:28px;transition:border-color .2s,transform .2s}
+.card:hover{border-color:rgba(168,85,247,.35);transform:translateY(-3px)}
+.card-ico{font-size:30px;margin-bottom:14px}
+.card h3{font-size:18px;font-weight:700;margin-bottom:8px}
+.card p{font-size:14px;color:var(--t2);line-height:1.65}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:18px;max-width:680px}
+.pcard{background:var(--card);border:1px solid var(--bdr);border-radius:18px;padding:32px;position:relative}
+.pcard-pro{border-color:rgba(168,85,247,.5);background:linear-gradient(135deg,rgba(124,58,237,.1),rgba(168,85,247,.05))}
+.pbadge{position:absolute;top:-11px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,#7C3AED,#A855F7);color:#fff;font-size:11px;font-weight:700;padding:3px 14px;border-radius:20px;white-space:nowrap}
+.pname{font-size:13px;color:var(--t2);text-transform:uppercase;letter-spacing:.1em;margin-bottom:10px}
+.pval{font-size:44px;font-weight:800;line-height:1}
+.pval span{font-size:18px;font-weight:400;color:var(--t2)}
+.pper{font-size:13px;color:var(--t3);margin-bottom:24px;margin-top:3px}
+.plist{list-style:none;display:flex;flex-direction:column;gap:9px;margin-bottom:24px}
+.plist li{font-size:13.5px;color:var(--t2)}
+.plist li.dim{color:var(--t3)}
+.btn-gf{display:block;text-align:center;padding:11px;border:1px solid var(--bdr);border-radius:10px;color:var(--t2);font-size:14px;font-weight:500;transition:all .2s}
+.btn-gf:hover{border-color:rgba(255,255,255,.2);color:#fff}
+footer{text-align:center;padding:70px 24px;border-top:1px solid var(--bdr);display:flex;flex-direction:column;align-items:center;gap:10px}
+.flogo{display:flex;align-items:center;gap:9px;font-size:19px;font-weight:700}
+.flogo img{width:30px;height:30px;border-radius:8px}
+.fsub{font-size:14px;color:var(--t3)}
+@media(max-width:860px){.nav{padding:14px 20px}.nav-links{display:none}section{padding:60px 20px}.grid3{grid-template-columns:1fr}.grid2{grid-template-columns:1fr;max-width:380px}.stats{gap:16px}.hero-inner{padding:110px 20px 60px}}
+</style>
+</head>
+<body>
+<nav class="nav">
+  <div class="nav-logo"><img src="logo.png" alt=""/>CronuxAI</div>
+  <div class="nav-links"><a href="#feat">Возможности</a><a href="#price">Цены</a></div>
+  <a href="index.html" class="nav-cta">Открыть →</a>
+</nav>
+<section class="hero">
+  <div class="orb orb1"></div><div class="orb orb2"></div><div class="orb orb3"></div>
+  <div class="hero-inner">
+    <div class="badge">✦ AI-ассистент нового поколения</div>
+    <h1 class="hero-title"><span class="gp">Умный.</span><br/><span class="gc">Быстрый.</span><br/><span class="gu">CronuxAI.</span></h1>
+    <p class="hero-sub">Мощный AI-ассистент на базе передовых языковых моделей. Отвечает на вопросы, пишет код, решает задачи — мгновенно.</p>
+    <div class="cta-row">
+      <a href="index.html" class="btn-p">Начать бесплатно</a>
+      <a href="#feat" class="btn-g">Узнать больше ↓</a>
+    </div>
+    <div class="stats">
+      <div class="stat"><span class="sn">3</span><span class="sl">Модели AI</span></div>
+      <div class="sdiv"></div>
+      <div class="stat"><span class="sn">∞</span><span class="sl">Возможностей</span></div>
+      <div class="sdiv"></div>
+      <div class="stat"><span class="sn">0₽</span><span class="sl">Для старта</span></div>
+    </div>
+  </div>
+</section>
+<section id="feat" style="background:none">
+  <div class="slbl">✦ Возможности</div>
+  <h2 class="stitle">Всё что нужно<br/><span class="gu">в одном месте</span></h2>
+  <div class="grid3">
+    <div class="card"><div class="card-ico">⬡</div><h3>Три модели AI</h3><p>Instant для быстрых ответов, Coder для разработки, Pro для сложных задач с глубоким reasoning.</p></div>
+    <div class="card"><div class="card-ico">🔍</div><h3>Поиск в интернете</h3><p>Актуальные данные из сети прямо в ответе. Включается одной кнопкой.</p></div>
+    <div class="card"><div class="card-ico">🧠</div><h3>Память</h3><p>Запоминает важные факты о тебе и использует их в каждом диалоге автоматически.</p></div>
+    <div class="card"><div class="card-ico">💻</div><h3>CronuxCoder</h3><p>Специализированная модель для разработчиков. Пишет, объясняет и дебажит код на любом языке.</p></div>
+    <div class="card"><div class="card-ico">📷</div><h3>OCR распознавание</h3><p>Загрузи фото с текстом — CronuxAI прочитает и обработает его мгновенно.</p></div>
+    <div class="card"><div class="card-ico">◈</div><h3>DeepThink</h3><p>Режим глубокого размышления для сложных математических и логических задач.</p></div>
+  </div>
+</section>
+<section id="price" style="background:none">
+  <div class="slbl">✦ Цены</div>
+  <h2 class="stitle">Просто и<br/><span class="gp">честно</span></h2>
+  <div class="grid2">
+    <div class="pcard">
+      <div class="pname">Free</div>
+      <div class="pval">0 <span>₽</span></div>
+      <div class="pper">навсегда</div>
+      <ul class="plist"><li>✓ 3 запроса в день</li><li>✓ Все 3 модели</li><li>✓ История чатов</li><li class="dim">✗ Поиск в интернете</li><li class="dim">✗ Память</li></ul>
+      <a href="index.html" class="btn-gf">Начать</a>
+    </div>
+    <div class="pcard pcard-pro">
+      <div class="pbadge">✦ Рекомендуем</div>
+      <div class="pname">Pro</div>
+      <div class="pval">300 <span>₽</span></div>
+      <div class="pper">в месяц</div>
+      <ul class="plist"><li>✓ 100 запросов в день</li><li>✓ Все 3 модели</li><li>✓ История чатов</li><li>✓ Поиск в интернете</li><li>✓ Память</li></ul>
+      <a href="index.html" class="btn-p" style="display:block;text-align:center">Получить Pro</a>
+    </div>
+  </div>
+</section>
+<footer>
+  <div class="flogo"><img src="logo.png" alt=""/>CronuxAI</div>
+  <p class="fsub">Интеллект нового поколения</p>
+  <a href="index.html" class="btn-p" style="margin-top:16px">Открыть CronuxAI →</a>
+</footer>
+</body>
+</html>
