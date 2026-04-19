@@ -2,3 +2,4 @@ node_modules/
 cronux/server/.env
 .vscode/
 *.log
+.kiro/settings/mcp.json
