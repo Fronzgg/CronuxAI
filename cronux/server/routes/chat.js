@@ -33,13 +33,16 @@ async function getGigaChatToken() {
     return tokenCache.token;
   }
 
+  const key = (process.env.GIGACHAT_API_KEY || '').trim();
+  console.log('[gigachat] key length:', key.length, '| last chars:', key.slice(-4));
+
   const res = await fetch('https://ngw.devices.sberbank.ru:9443/api/v2/oauth', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/x-www-form-urlencoded',
       'Accept': 'application/json',
       'RqUID': randomUUID(),
-      'Authorization': `Basic ${process.env.GIGACHAT_API_KEY}`,
+      'Authorization': `Basic ${key}`,
     },
     body: 'scope=GIGACHAT_API_PERS',
     agent: httpsAgent,
