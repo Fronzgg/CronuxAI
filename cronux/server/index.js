@@ -16,7 +16,6 @@ app.use(express.static(path.join(__dirname, '..')));
 app.use('/api/chat',    require('./routes/chat'));
 app.use('/api/search',  require('./routes/search'));
 app.use('/api/ocr',     require('./routes/ocr'));
-app.use('/api/vision',  require('./routes/vision')); // временно отключено — нужен npm install form-data
 app.use('/api/credits', require('./routes/credits'));
 
 // Версия для облачных обновлений Flutter
