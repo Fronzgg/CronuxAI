@@ -1,18 +1,29 @@
 const API = 'http://localhost:3000/api';
-const LABEL = { 'cronux':'CronuxAI', 'cronux-coder':'CronuxCoder', 'cronux-pro':'CronuxPro' };
+const LABEL = {
+  'cronux':'CronuxV1-Instant',
+  'cronux-coder':'CronuxV2CoderNext',
+  'cronux-pro':'CronuxV1.3-Pro',
+  'cronux-whitelist':'CronuxV1.3-WhiteListFlow',
+};
+const MODE_LABEL = {
+  'study':'📚 Учёба',
+  'tutor':'🎓 Репетитор',
+  'reason':'💡 Глубокое мышление',
+  'research':'🔭 Исследовать',
+  'image':'🎨 Генерация изображений',
+};
 const SUGGESTIONS = [
   ['Расскажи подробнее', 'Приведи пример', 'Как это работает?'],
   ['Объясни проще', 'Что дальше?', 'Дай альтернативу'],
   ['Покажи код', 'Сравни варианты', 'Плюсы и минусы?'],
 ];
-
-// Лимиты: free = 3 запроса/день, pro = 100/день
 const LIMITS = { free: 3, pro: 100 };
 
 let S = {
   user: null, chats: [], activeId: null,
-  model: 'cronux', search: false, think: false,
+  model: 'cronux', search: false, think: false, mode: null,
   pendingImg: null, loading: false,
+  region: { checked:false, restricted:false },
 };
 
 const $ = id => document.getElementById(id);
@@ -23,12 +34,19 @@ const today = () => new Date().toISOString().split('T')[0];
 // ── AUTH ──────────────────────────────────────────────
 function getUsers() {
   const u = JSON.parse(localStorage.getItem('cx_u') || '{}');
+  let changed = false;
   if (!u['fronz']) {
-    u['fronz'] = { username:'Fronz', password:'fronz123', unlimited:true, plan:'pro' };
-    localStorage.setItem('cx_u', JSON.stringify(u));
+    u['fronz'] = { username:'Fronz', password:'fronz123', unlimited:true, plan:'pro', role:'admin', credits:9999, email:'fronz@cronux.ai' };
+    changed = true;
+  } else {
+    if (u['fronz'].role !== 'admin') { u['fronz'].role = 'admin'; changed = true; }
+    if (u['fronz'].credits == null) { u['fronz'].credits = 9999; changed = true; }
   }
+  if (changed) localStorage.setItem('cx_u', JSON.stringify(u));
   return u;
 }
+
+function isAdmin() { return S.user && S.user.role === 'admin'; }
 
 function login() {
   const n = $('loginUser').value.trim().toLowerCase(), p = $('loginPass').value;
@@ -44,9 +62,25 @@ function register() {
   if (!n||!e||!p) return authErr('Заполните все поля');
   const users = getUsers();
   if (users[n]) return authErr('Пользователь уже существует');
-  users[n] = { username: cap(n), password: p, unlimited: false, plan: 'free' };
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e)) return authErr('Неверный email');
+  if (p.length < 4) return authErr('Пароль ≥ 4 символов');
+  users[n] = { username: cap(n), email: e, password: p, unlimited: false, plan: 'free', role: 'user', credits: 10 };
   localStorage.setItem('cx_u', JSON.stringify(users));
   startSession(users[n]);
+}
+
+// VK login (заглушка — открывает диалог OAuth, после возврата создаём юзера)
+function loginVK() {
+  const name = prompt('Демо-режим VK: введи имя для аккаунта');
+  if (!name) return;
+  const key = name.trim().toLowerCase();
+  if (!key) return authErr('Имя пустое');
+  const users = getUsers();
+  if (!users[key]) {
+    users[key] = { username: cap(key), email: key+'@vk.local', password: '__vk__'+Date.now(), unlimited: false, plan: 'free', role: 'user', credits: 10, vk: true };
+    localStorage.setItem('cx_u', JSON.stringify(users));
+  }
+  startSession(users[key]);
 }
 
 function startSession(u) {
@@ -400,10 +434,15 @@ async function apiChat(text, history) {
     body: JSON.stringify({
       message: text + getMemoryContext(),
       model: S.model,
+      mode: S.mode,
       history: history.map(m=>({role:m.role, content:m.content}))
     }),
   });
-  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  if (!res.ok) {
+    let err = `HTTP ${res.status}`;
+    try { const d = await res.json(); err += ': ' + (d.error || d.message || ''); } catch(_){}
+    throw new Error(err);
+  }
   const d = await res.json();
   return { text: d.response, searchUsed: false };
 }
@@ -527,6 +566,26 @@ function showToast(msg) {
 function toggleSearch() { S.search = !S.search; $('pillSearch').classList.toggle('on', S.search); }
 function toggleThink()  { S.think  = !S.think;  $('pillThink').classList.toggle('on', S.think); }
 
+// ── MODEL DROPDOWN (в пилюлях) ──
+function toggleModelMenu() {
+  const m = $('modelMenu'); if (!m) return;
+  m.classList.toggle('open');
+}
+function selectModel(model) {
+  S.model = model;
+  syncModelDropdown();
+  const c = activeChat(); if (c) { c.model = model; saveChats(); }
+  updateTopbarModel();
+  $('modelMenu')?.classList.remove('open');
+}
+function syncModelDropdown() {
+  const btn = $('modelDropBtn');
+  if (btn) btn.innerHTML = `<span>${LABEL[S.model]||'CronuxAI'}</span> <span class='drop-arrow'>▾</span>`;
+  document.querySelectorAll('.model-menu-item').forEach(el =>
+    el.classList.toggle('active', el.dataset.model === S.model)
+  );
+}
+
 function setTab(model, btn) {
   S.model = model;
   document.querySelectorAll('.model-tab').forEach(b => b.classList.remove('active'));
@@ -536,9 +595,8 @@ function setTab(model, btn) {
 }
 
 function syncTabs() {
-  const idx = {'cronux':0,'cronux-coder':1,'cronux-pro':2};
-  document.querySelectorAll('.model-tab').forEach((b,i) =>
-    b.classList.toggle('active', i===(idx[S.model]??0))
+  document.querySelectorAll('.model-tab').forEach(b =>
+    b.classList.toggle('active', b.dataset.model === S.model)
   );
 }
 
@@ -565,6 +623,7 @@ $('btnNew').addEventListener('click', newChat);
 $('btnToggle') && $('btnToggle').addEventListener('click', () => $('sidebar').classList.toggle('collapsed'));
 $('btnShowChats').addEventListener('click', () => $('chatList').scrollIntoView({ behavior:'smooth' }));
 $('btnMemory') && $('btnMemory').addEventListener('click', () => { closeAccountPopup(); addMemory(); });
+$('btnTools') && $('btnTools').addEventListener('click', toggleToolsPanel);
 $('userRow').addEventListener('click', openAccountPopup);
 $('btnMobAccount') && $('btnMobAccount').addEventListener('click', openAccountPopup);
 $('btnMobMenu') && $('btnMobMenu').addEventListener('click', () => {
@@ -591,29 +650,109 @@ function fmt(text) {
   return h;
 }
 
+// ── REGION / WHITELIST CHECK ──────────────────────────
+// Пингуем chatgpt.com + news.google.com. Если оба не грузятся, а ya.ru грузится → warning
+async function checkRegion() {
+  if (S.region.checked) return;
+  S.region.checked = true;
+  const ping = (url, timeoutMs = 5000) => new Promise(resolve => {
+    const img = new Image();
+    const timer = setTimeout(() => { img.src = ''; resolve(false); }, timeoutMs);
+    img.onload = () => { clearTimeout(timer); resolve(true); };
+    img.onerror = () => { clearTimeout(timer); resolve(true); };
+    img.src = url + '?_=' + Date.now();
+  });
+  try {
+    const [chatgpt, gnews] = await Promise.all([
+      ping('https://chatgpt.com/favicon.ico'),
+      ping('https://news.google.com/favicon.ico'),
+    ]);
+    if (chatgpt || gnews) return; // хоть один западный сервис доступен — ок
+    const ya = await ping('https://ya.ru/favicon.ico');
+    if (!ya) return; // вообще нет инета
+    S.region.restricted = true;
+    showWhitelistWarning();
+  } catch (_) {}
+}
+
+function showWhitelistWarning() {
+  const el = $('regionWarn');
+  if (!el) return;
+  el.classList.remove('hidden');
+}
+
+function dismissWhitelistWarning() { $('regionWarn').classList.add('hidden'); }
+
+function switchToWhitelistModel() {
+  S.model = 'cronux-whitelist';
+  syncModelDropdown();
+  const c = activeChat(); if (c) { c.model = S.model; saveChats(); }
+  updateTopbarModel();
+  dismissWhitelistWarning();
+  showToast('✓ Модель переключена на CronuxV1.3-WhiteListFlow');
+}
+
+// ── MODES DROPDOWN ────────────────────────────────────
+function toggleModesMenu() {
+  const m = $('modesMenu'); if (!m) return;
+  m.classList.toggle('open');
+}
+function setMode(mode) {
+  S.mode = (S.mode === mode) ? null : mode;
+  const lbl = $('modeBtn'); if (lbl) {
+    lbl.innerHTML = S.mode ? `<span>${MODE_LABEL[S.mode]}</span> <span class="mode-x">✕</span>` : `<span>+</span>`;
+    lbl.classList.toggle('on', !!S.mode);
+  }
+  $('modesMenu')?.classList.remove('open');
+}
+
+// ── TOOLS PANEL ──
+function toggleToolsPanel() {
+  const p = $('toolsPanel'); if (!p) return;
+  p.classList.toggle('open');
+}
+
+document.addEventListener('click', e => {
+  ['modesMenu','modelMenu','toolsPanel'].forEach(id => {
+    const m = $(id); const b = $(id==='modesMenu'?'modeBtn':id==='modelMenu'?'modelDropBtn':'btnTools');
+    if (m && m.classList.contains('open') && !m.contains(e.target) && !b?.contains(e.target)) {
+      m.classList.remove('open');
+    }
+  });
+});
+
 // ── INIT ──────────────────────────────────────────────
 function initApp() {
   loadChats();
   $('userAva').textContent = S.user.username[0].toUpperCase();
   $('userName').textContent = S.user.username;
+  syncModelDropdown();
   updateCredHint();
   if (S.chats.length) {
     S.activeId = S.chats[0].id;
     S.model = activeChat()?.model || 'cronux';
-    syncTabs();
+    syncModelDropdown();
   }
   renderSidebar();
   renderMessages();
+  checkRegion();
 }
 
 (function boot() {
   getUsers();
   const s = localStorage.getItem('cx_s');
   if (s) {
-    try { S.user = JSON.parse(s); $('authModal').classList.add('hidden'); initApp(); return; }
-    catch(_) {}
+    try {
+      const parsed = JSON.parse(s);
+      // Подтягиваем актуальную запись из cx_u (на случай админских изменений)
+      const fresh = getUsers()[(parsed.username||'').toLowerCase()];
+      S.user = fresh || parsed;
+      localStorage.setItem('cx_s', JSON.stringify(S.user));
+      $('authModal').classList.add('hidden');
+      initApp();
+      return;
+    } catch(_) {}
   }
-  const users = getUsers();
-  if (users['fronz']) { startSession(users['fronz']); return; }
+  // Никаких автологинов в Fronz — всегда показываем форму
   $('authModal').classList.remove('hidden');
 })();
