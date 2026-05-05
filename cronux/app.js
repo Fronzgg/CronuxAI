@@ -1,4 +1,4 @@
-const API = 'http://localhost:3000/api';
+const API = '/api';
 const LABEL = {
   'cronux':'CronuxV1-Instant',
   'cronux-coder':'CronuxV2CoderNext',
